@@ -35,25 +35,37 @@ export const useFetchEscalationPolicies = (INTEGRATION_SETUP_ID: string) => {
       .finally(() => setLoading(false))
   }, [])
 
+  const fetchEscalationPolicies = useCallback(() => {
+    setLoading(true)
+
+    return bearer
+      .functionFetch(INTEGRATION_NAME, 'listEscalationPolicies', {
+        query: { setupId: INTEGRATION_SETUP_ID },
+      })
+      .then(({ data }) => {
+        setPolicies(data)
+        return data
+      })
+      .catch(error => {
+        setError(error)
+        return error
+      })
+      .finally(() => setLoading(false))
+  }, [setLoading, INTEGRATION_SETUP_ID, setPolicies, setError])
+
   return { loading, data: { policies }, error }
 }
 
-export const useCreateIntegration = (
-  policy: Policy,
-  INTEGRATION_SETUP_ID: string,
-) => {
-  const [start, setStart] = useState(false)
-
+export const useCreateIntegration = (INTEGRATION_SETUP_ID: string) => {
   const [loading, setLoading] = useState(false)
   const [referenceId, setReferenceId] = useState<string>()
   const [error, setError] = useState<any>()
   const { bearer } = useContext(BearerContext)
 
-  useEffect(() => {
-    if (start) {
+  const createIntegration = useCallback(
+    (policy: Policy | undefined) => {
       setLoading(true)
-
-      bearer
+      return bearer
         .functionFetch(INTEGRATION_NAME, 'createIntegration', {
           query: {
             setupId: INTEGRATION_SETUP_ID,
@@ -62,53 +74,56 @@ export const useCreateIntegration = (
         })
         .then(({ referenceId }) => {
           setReferenceId(referenceId)
+          return referenceId
         })
-        .catch(setError)
+        .catch(error => {
+          setError(error)
+          return error
+        })
         .finally(() => {
           setLoading(false)
-          setStart(false)
         })
-    }
-  }, [start])
-
-  const createIntegration = useCallback(() => {
-    setStart(true)
-  }, [])
+    },
+    [setLoading, INTEGRATION_SETUP_ID, setReferenceId, setError],
+  )
 
   return { loading, data: { referenceId }, error, createIntegration }
 }
 
-export const sendEvent = (INTEGRATION_SETUP_ID: string) => {
-  const [start, setStart] = useState(false)
-
-  const [referenceId, setReferenceId] = useState('')
+interface EventResult {
+  data: {
+    status: 'success'
+    message: string
+    incident_key: string
+  }
+  referenceId?: string
+}
+export const useSendEvent = (INTEGRATION_SETUP_ID: string) => {
   const [loading, setLoading] = useState(false)
-  const [eventResult, setEventResult] = useState<any>()
+  const [eventResult, setEventResult] = useState<EventResult>()
   const [error, setError] = useState<any>()
   const { bearer } = useContext(BearerContext)
 
-  useEffect(() => {
-    if (start) {
-      setLoading(true)
-      bearer
-        .functionFetch(INTEGRATION_NAME, 'sendEvent', {
-          query: {
-            setupId: INTEGRATION_SETUP_ID,
-            referenceId,
-          },
-        })
-        .then(setEventResult)
-        .catch(setError)
-        .finally(() => {
-          setLoading(false)
-          setStart(false)
-        })
-    }
-  }, [referenceId, start])
-
   const sendEvent = useCallback((referenceId: string) => {
-    setReferenceId(referenceId)
-    setStart(true)
+    setLoading(true)
+    return bearer
+      .functionFetch<EventResult>(INTEGRATION_NAME, 'sendEvent', {
+        query: {
+          setupId: INTEGRATION_SETUP_ID,
+          referenceId,
+        },
+      })
+      .then(result => {
+        setEventResult(result.data)
+        return result.data
+      })
+      .catch(error => {
+        setError(error)
+        return error
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }, [])
 
   return { loading, data: { eventResult }, error, sendEvent }

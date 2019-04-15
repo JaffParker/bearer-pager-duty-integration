@@ -1,41 +1,32 @@
 import * as React from 'react'
-import { INTEGRATION_NAME, INTEGRATION_SETUP_ID } from './etc/constants'
-import { BearerContext } from '@bearer/react/lib/bearer-provider'
+import { INTEGRATION_SETUP_ID } from './etc/constants'
+import { useSendEvent } from './integrations'
 
-export default class SendTestEvent extends React.Component<any> {
-  static contextType = BearerContext
-  context!: React.ContextType<typeof BearerContext>
+interface SendTestEventProps {
+  referenceId?: string
+}
 
-  sendEvent = (e: any) => {
-    e.preventDefault()
-    this.context.bearer
-      .functionFetch(INTEGRATION_NAME, 'sendEvent', {
-        query: {
-          setupId: INTEGRATION_SETUP_ID,
-          referenceId: this.props.referenceId,
-        },
-      })
-      .then(data => {
-        console.log('Event details', data)
-        alert(JSON.stringify(data))
-      })
-      .catch(console.error)
-  }
+export default function SendTestEvent({ referenceId }: SendTestEventProps) {
+  const { sendEvent } = useSendEvent(INTEGRATION_SETUP_ID)
 
-  handleSubmit = (e: any) => {
-    e.preventDefault()
-  }
+  const handleSendEvent = React.useCallback(() => {
+    if (referenceId)
+      sendEvent(referenceId)
+        .then(data => {
+          console.log('Event details', data)
+          alert(JSON.stringify(data))
+        })
+        .catch(console.error)
+  }, [sendEvent, referenceId])
 
-  render() {
-    return (
-      <button
-        type="button"
-        disabled={!this.props.referenceId}
-        className="btn btn-secondary"
-        onClick={this.sendEvent}
-      >
-        Send test event
-      </button>
-    )
-  }
+  return (
+    <button
+      type="button"
+      disabled={!referenceId}
+      className="btn btn-secondary"
+      onClick={handleSendEvent}
+    >
+      Send test event
+    </button>
+  )
 }
