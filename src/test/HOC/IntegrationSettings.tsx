@@ -1,15 +1,8 @@
 import * as React from 'react'
-import { INTEGRATION_SETUP_ID, REFERENCE_ID } from './etc/constants'
-import SendTestEvent from './integrations-send-event'
-import {
-  useFetchEscalationPolicies,
-  useCreateIntegration,
-} from './integrations'
-
-interface Policy {
-  id: string
-  summary: string
-}
+import { Policy } from '../../lib/types'
+import { useFetchEscalationPolicies, useCreateIntegration } from '../../lib'
+import { INTEGRATION_SETUP_ID, REFERENCE_ID } from '../../etc/constants'
+import SendTestEvent from './SendTestEvent'
 
 export default function IntegrationSettings() {
   const [policies, setEscalationPolicies] = React.useState<Policy[]>()

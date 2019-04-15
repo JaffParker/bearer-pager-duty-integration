@@ -1,14 +1,17 @@
 import * as React from 'react'
-import { INTEGRATION_SETUP_ID } from './etc/constants'
-import { useSendEvent } from './integrations'
+import { withSendEvent } from '../../lib'
+import { INTEGRATION_SETUP_ID } from '../../etc/constants'
+import { SendEventProps } from '../../lib/HOC/withSendEvent'
 
 interface SendTestEventProps {
   referenceId?: string
 }
 
-export default function SendTestEvent({ referenceId }: SendTestEventProps) {
-  const { sendEvent } = useSendEvent(INTEGRATION_SETUP_ID)
-
+const SendTestEvent: React.FC<SendEventProps & SendTestEventProps> = ({
+  referenceId,
+  fetch: sendEvent,
+  loading,
+}) => {
   const handleSendEvent = React.useCallback(() => {
     if (referenceId)
       sendEvent(referenceId)
@@ -22,11 +25,13 @@ export default function SendTestEvent({ referenceId }: SendTestEventProps) {
   return (
     <button
       type="button"
-      disabled={!referenceId}
+      disabled={!referenceId || loading}
       className="btn btn-secondary"
       onClick={handleSendEvent}
     >
-      Send test event
+      {loading ? 'Loading...' : 'Send test event'}
     </button>
   )
 }
+
+export default withSendEvent(SendTestEvent, INTEGRATION_SETUP_ID)
