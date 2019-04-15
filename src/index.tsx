@@ -4,7 +4,7 @@ import { Bearer } from '@bearer/react'
 import { BEARER_CLIENT_ID } from './etc/constants'
 
 // To test different types of integration styles, just switch the uncommented line below
-import IntegrationSettings from './test/HOC/IntegrationSettings'
+import IntegrationSettings from './examples/HOC/IntegrationSettings'
 // import IntegrationSettings from './test/hooks/IntegrationSettings'
 
 function App() {
