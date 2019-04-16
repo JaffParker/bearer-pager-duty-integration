@@ -2,6 +2,7 @@ import * as React from 'react'
 import { render } from 'react-dom'
 import { Bearer } from '@bearer/react'
 import { BEARER_CLIENT_ID } from './etc/constants'
+import './styles.css'
 
 // To test different types of integration styles, just switch the uncommented line below
 import IntegrationSettings from './examples/HOC/IntegrationSettings'
@@ -9,11 +10,11 @@ import IntegrationSettings from './examples/HOC/IntegrationSettings'
 
 function App() {
   return (
-    <Bearer clientId={BEARER_CLIENT_ID}>
-      <div className="App">
+    <div className="App">
+      <Bearer clientId={BEARER_CLIENT_ID}>
         <IntegrationSettings />
-      </div>
-    </Bearer>
+      </Bearer>
+    </div>
   )
 }
 
