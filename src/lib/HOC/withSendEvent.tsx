@@ -5,7 +5,7 @@ import { EventResult, FetchProps } from '../types'
 
 export type SendEventProps = FetchProps<EventResult>
 
-export function withSendEvent<P = any>(
+export function withSendEvent<P = {}>(
   Component: ComponentType<SendEventProps & P>,
   INTEGRATION_SETUP_ID: string,
 ): ComponentType<P> {
@@ -16,9 +16,9 @@ export function withSendEvent<P = any>(
 
     return (
       <Component
+        {...props}
         data={data.eventResult}
         fetch={sendEvent}
-        {...props}
         {...sendEventProps}
       />
     )

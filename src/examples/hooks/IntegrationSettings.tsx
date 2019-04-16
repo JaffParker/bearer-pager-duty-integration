@@ -1,15 +1,17 @@
 import * as React from 'react'
-import { Policy } from '../../lib/types'
 import { useFetchEscalationPolicies, useCreateIntegration } from '../../lib'
 import { INTEGRATION_SETUP_ID, REFERENCE_ID } from '../../etc/constants'
 import SendTestEvent from './SendTestEvent'
 
 export default function IntegrationSettings() {
-  const [policies, setEscalationPolicies] = React.useState<Policy[]>()
   const [selectedPolicyKey, setSelectedPolicy] = React.useState<number>(-1)
-  const { data, loading } = useFetchEscalationPolicies(INTEGRATION_SETUP_ID)
+  const {
+    data: { policies },
+    loading,
+  } = useFetchEscalationPolicies(INTEGRATION_SETUP_ID)
   const {
     createIntegration,
+    loading: saving,
     data: { referenceId },
   } = useCreateIntegration(INTEGRATION_SETUP_ID)
 
@@ -30,10 +32,6 @@ export default function IntegrationSettings() {
     },
     [createIntegration],
   )
-
-  React.useEffect(() => {
-    if (data) setEscalationPolicies(data.policies)
-  }, [data, setEscalationPolicies])
 
   if (!policies || loading) {
     return <p>Fetching escalation policies...</p>
@@ -56,7 +54,7 @@ export default function IntegrationSettings() {
       </select>
 
       <button type="submit" className="btn btn-primary">
-        Save settings
+        {saving ? 'Saving...' : 'Save settings'}
       </button>
 
       <SendTestEvent referenceId={referenceId || REFERENCE_ID} />

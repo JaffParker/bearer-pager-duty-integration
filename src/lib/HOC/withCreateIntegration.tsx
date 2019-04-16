@@ -1,6 +1,27 @@
-import { INTEGRATION_NAME } from '../../etc/constants'
-import { factory } from '@bearer/react'
+import React, { ComponentType } from 'react'
+import { FetchProps } from '../types'
+import { useCreateIntegration } from '../hooks/useCreateIntegration'
 
-const { withFunctionCall } = factory(INTEGRATION_NAME)
+export type CreateIntegrationFetchProps = FetchProps<string>
 
-export const withCreateIntegration = withFunctionCall<any>('createIntegration')
+export function withCreateIntegration<P = {}>(
+  Component: ComponentType<CreateIntegrationFetchProps & P>,
+  INTEGRATION_SETUP_ID: string,
+): ComponentType<P> {
+  return (props: P) => {
+    const {
+      createIntegration,
+      data,
+      ...createIntegrationProps
+    } = useCreateIntegration(INTEGRATION_SETUP_ID)
+
+    return (
+      <Component
+        {...props}
+        fetch={createIntegration}
+        data={data.referenceId}
+        {...createIntegrationProps}
+      />
+    )
+  }
+}
